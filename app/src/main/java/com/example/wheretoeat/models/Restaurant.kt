@@ -1,4 +1,4 @@
-package com.example.wheretoeat
+package com.example.wheretoeat.models
 
 data class Restaurant(
     val id: Int,
@@ -21,6 +21,5 @@ data class Restaurant(
 
         return "Id: $id\nAddress: $address\nCity: $city\nState: $state\nArea: $area\nPostal code: $postal_code\nCountry: $country\nPhone: $phone\nLat: $lat\n" +
                 "Lng: $lng\nPrice: $price\nReserve url: $reserve_url\nMobile reserve url: $mobile_reserve_url\nImage_url: $image_url\n"
-
     }
 }

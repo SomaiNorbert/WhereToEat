@@ -1,4 +1,4 @@
-package com.example.wheretoeat
+package com.example.wheretoeat.models
 
 data class Cities(
     val cities: List<String>,

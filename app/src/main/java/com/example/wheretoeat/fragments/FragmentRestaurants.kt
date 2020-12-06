@@ -1,4 +1,4 @@
-package com.example.wheretoeat
+package com.example.wheretoeat.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,9 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wheretoeat.*
+import com.example.wheretoeat.models.ExampleItem
+import com.example.wheretoeat.models.ResponseDS
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -31,7 +34,7 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
             .baseUrl("https://opentable.herokuapp.com/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val openTableAPI:OpenTableAPI = retrofit.create(OpenTableAPI::class.java)
+        val openTableAPI: OpenTableAPI = retrofit.create(OpenTableAPI::class.java)
         val myCall: Call<ResponseDS> = openTableAPI.getRestaurants()
         myCall.enqueue(object: Callback<ResponseDS>{
             override fun onResponse(call: Call<ResponseDS>, response: Response<ResponseDS>) {
@@ -46,9 +49,8 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
             }
         })
         rViewRestaurants.adapter = RecyclerViewAdapter(rList, this)
-        rViewRestaurants.layoutManager = LinearLayoutManager(this.context)
+        rViewRestaurants.layoutManager = LinearLayoutManager(requireContext())
         rViewRestaurants.setHasFixedSize(true)
-
         return view
     }
 
