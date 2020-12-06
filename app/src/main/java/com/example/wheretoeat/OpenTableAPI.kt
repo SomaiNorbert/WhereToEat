@@ -10,7 +10,7 @@ import retrofit2.http.Query
 
 interface OpenTableAPI {
 
-    @GET("restaurants?")//TODO
+    @GET("restaurants?")
     fun getRestaurants(@Query("city") city:String):Call<ResponseDS>
 
     @GET("cities")

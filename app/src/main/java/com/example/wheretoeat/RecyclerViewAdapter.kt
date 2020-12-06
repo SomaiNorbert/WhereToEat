@@ -24,14 +24,13 @@ class RecyclerViewAdapter(
         //holder.imageView.setImageResource(R.drawable.defaultimg);
         holder.textTitle.text = currentItem.title
         holder.textAddress.text = currentItem.address
-        holder.textPrice.text = currentItem.price.toString()
+        val txt = "Price: " + currentItem.price.toString()
+        holder.textPrice.text = txt
         if(currentItem.favorite){
             holder.imageViewStar.setImageResource(R.drawable.favorite);
         }else{
             holder.imageViewStar.setImageResource(R.drawable.star);
         }
-
-
     }
 
     override fun getItemCount() = exampleList.size
@@ -54,7 +53,6 @@ class RecyclerViewAdapter(
                 listener.onItemClick(position)
             }
         }
-
     }
 
     interface OnItemClickedListener{

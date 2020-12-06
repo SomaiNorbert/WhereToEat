@@ -1,8 +1,10 @@
 package com.example.wheretoeat.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +27,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class FragmentDetail() : Fragment() {
 
-    lateinit var imgFavorite:ImageView
+    private lateinit var imgFavorite:ImageView
+    lateinit var imgRestaurant:ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,13 +38,19 @@ class FragmentDetail() : Fragment() {
 
         val txtRestaurantName = view.findViewById<TextView>(R.id.txtRestaurantName)
         val txtDetails = view.findViewById<TextView>(R.id.txtDetails)
-        val imgRestaurant = view.findViewById<ImageView>(R.id.imgRestaurant)
+        imgRestaurant = view.findViewById<ImageView>(R.id.imgRestaurant)
         val callButton = view.findViewById<Button>(R.id.callButton)
         val googleMapsButton = view.findViewById<Button>(R.id.googleMapsButton)
         imgFavorite = view.findViewById<ImageView>(R.id.imgFavorite)
+        val changeImageButton = view.findViewById<Button>(R.id.changeImgButton)
 
         val id: Int? = arguments?.getInt("id")
         var phoneNumber:String = ""
+
+        changeImageButton.setOnClickListener {
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, 100)
+        }
 
         imgFavorite.setOnClickListener {
             val databaseHandler = MySqliteHandler((activity as MainActivity))
@@ -52,7 +61,6 @@ class FragmentDetail() : Fragment() {
                 databaseHandler.removeIDfromFavorites(id)
             }
             updateImg(id)
-
         }
 
         val retrofit = Retrofit.Builder()
@@ -85,18 +93,12 @@ class FragmentDetail() : Fragment() {
                     mapIntent.setPackage("com.google.android.apps.maps")
                     startActivity(mapIntent)
                 }
-
             }
-
             override fun onFailure(call: Call<Restaurant>, t: Throwable) {
                 Log.e("asd", t.message.toString())
             }
         })
-
-
         Thread.sleep(1000)
-
-
         return view;
     }
 
@@ -107,6 +109,14 @@ class FragmentDetail() : Fragment() {
         }
         else {
             imgFavorite.setImageResource(R.drawable.star)
+        }
+    }
+
+    @Override
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == 100) {
+            imgRestaurant.setImageURI(Uri.parse(data?.data.toString()))
         }
     }
 

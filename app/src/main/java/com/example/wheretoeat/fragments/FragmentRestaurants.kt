@@ -28,6 +28,7 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
     private lateinit var rViewRestaurants : RecyclerView
     var onlyFavorites = false
     lateinit var onlyFavoritesCheckBox:CheckBox
+    lateinit var noRestaurants:TextView
 
     override fun onResume(){
         super.onResume()
@@ -43,11 +44,13 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
         StrictMode.setThreadPolicy(policy)
 
         val view = inflater.inflate(R.layout.fragment_restaurants, container, false)
-        rViewRestaurants = view.findViewById<RecyclerView>(R.id.rViewRestaurants)
+        rViewRestaurants = view.findViewById(R.id.rViewRestaurants)
         val etxtSearch = view.findViewById<EditText>(R.id.etxtSearch)
         val citiesSpinner = view.findViewById<Spinner>(R.id.citiesSpinner)
         val priceSpinner = view.findViewById<Spinner>(R.id.priceSpinner)
-        onlyFavoritesCheckBox = view.findViewById<CheckBox>(R.id.onlyFavoritesCheckBox)
+        onlyFavoritesCheckBox = view.findViewById(R.id.onlyFavoritesCheckBox)
+        noRestaurants = view.findViewById(R.id.txtNoRestaurants)
+        noRestaurants.visibility = View.INVISIBLE
 
         rList = ArrayList();
         var executed = false
@@ -112,7 +115,6 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
                 showRestaurants(newList)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
             }
         }
 
@@ -157,6 +159,12 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
 
     fun showRestaurants(list:ArrayList<ExampleItem>){
         currentList = list
+        if(currentList.isEmpty()){
+            noRestaurants.visibility = View.VISIBLE
+        }
+        else{
+            noRestaurants.visibility = View.INVISIBLE
+        }
         rViewRestaurants.adapter = RecyclerViewAdapter(list, this)
         rViewRestaurants.layoutManager = LinearLayoutManager(requireContext())
         rViewRestaurants.setHasFixedSize(true)
