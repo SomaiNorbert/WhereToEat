@@ -6,11 +6,12 @@ import com.example.wheretoeat.models.Restaurant
 import retrofit2.http.GET
 import retrofit2.Call
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface OpenTableAPI {
 
-    @GET("restaurants?city=Chicago")//TODO
-    fun getRestaurants():Call<ResponseDS>
+    @GET("restaurants?")//TODO
+    fun getRestaurants(@Query("city") city:String):Call<ResponseDS>
 
     @GET("cities")
     fun getCities():Call<Cities>

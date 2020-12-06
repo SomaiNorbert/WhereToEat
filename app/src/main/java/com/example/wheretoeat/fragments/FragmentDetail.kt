@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.wheretoeat.MainActivity
+import com.example.wheretoeat.MySqliteHandler
 import com.example.wheretoeat.OpenTableAPI
 import com.example.wheretoeat.R
 import com.example.wheretoeat.models.Restaurant
@@ -23,6 +25,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class FragmentDetail() : Fragment() {
 
+    lateinit var imgFavorite:ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,9 +38,22 @@ class FragmentDetail() : Fragment() {
         val imgRestaurant = view.findViewById<ImageView>(R.id.imgRestaurant)
         val callButton = view.findViewById<Button>(R.id.callButton)
         val googleMapsButton = view.findViewById<Button>(R.id.googleMapsButton)
+        imgFavorite = view.findViewById<ImageView>(R.id.imgFavorite)
 
         val id: Int? = arguments?.getInt("id")
         var phoneNumber:String = ""
+
+        imgFavorite.setOnClickListener {
+            val databaseHandler = MySqliteHandler((activity as MainActivity))
+            if(!databaseHandler.isFavorite(id!!)){
+                databaseHandler.addIDtoFavorites(id)
+            }
+            else{
+                databaseHandler.removeIDfromFavorites(id)
+            }
+            updateImg(id)
+
+        }
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://opentable.herokuapp.com/api/")
@@ -48,8 +65,10 @@ class FragmentDetail() : Fragment() {
             override fun onResponse(call: Call<Restaurant>, response: Response<Restaurant>) {
                 val restaurant = response.body()!!
                 txtRestaurantName.text = restaurant.name
-                txtDetails.text = restaurant.toString();
-                imgRestaurant.setImageResource(R.mipmap.profileicon);
+                txtDetails.text = restaurant.toString()
+                imgRestaurant.setImageResource(R.mipmap.profileicon)
+
+                updateImg(restaurant.id)
 
                 phoneNumber = restaurant.phone
                 callButton.setOnClickListener {
@@ -70,7 +89,7 @@ class FragmentDetail() : Fragment() {
             }
 
             override fun onFailure(call: Call<Restaurant>, t: Throwable) {
-                Log.e("asd", t.message.toString());
+                Log.e("asd", t.message.toString())
             }
         })
 
@@ -79,6 +98,16 @@ class FragmentDetail() : Fragment() {
 
 
         return view;
+    }
+
+    private fun updateImg(id:Int){
+        val databaseHandler = MySqliteHandler((activity as MainActivity))
+        if(databaseHandler.isFavorite(id)){
+            imgFavorite.setImageResource(R.drawable.favorite)
+        }
+        else {
+            imgFavorite.setImageResource(R.drawable.star)
+        }
     }
 
 }

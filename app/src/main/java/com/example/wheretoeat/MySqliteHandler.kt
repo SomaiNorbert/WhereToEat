@@ -73,8 +73,10 @@ class MySqliteHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         values.put(COLUMN_ADDRESS, profile.address)
         values.put(COLUMN_EMAIL, profile.email)
         values.put(COLUMN_IMAGE, profile.image)
-        database.execSQL("UPDATE $TABLE_PROFILE SET $COLUMN_NAME = '" + profile.name + "' , $COLUMN_PHONE_NUMBER = '" + profile.phoneNumber +
-                "' , $COLUMN_ADDRESS = '" + profile.address + "' , $COLUMN_EMAIL = '" + profile.email + "' , $COLUMN_IMAGE = '" + profile.image + "'")//TODO
+        database.execSQL(
+            "UPDATE $TABLE_PROFILE SET $COLUMN_NAME = '" + profile.name + "' , $COLUMN_PHONE_NUMBER = '" + profile.phoneNumber +
+                    "' , $COLUMN_ADDRESS = '" + profile.address + "' , $COLUMN_EMAIL = '" + profile.email + "' , $COLUMN_IMAGE = '" + profile.image + "'"
+        )//TODO
         database.close()
     }
 
@@ -83,14 +85,28 @@ class MySqliteHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         val database = this.readableDatabase
         val cursor: Cursor = database.rawQuery(selectAllQuery, null)
         if (cursor.moveToFirst()) {
-                return Profile(cursor.getString(0),cursor.getString(1),cursor.getString(2),
-                        cursor.getString(3),cursor.getString(4))
+                return Profile(
+                    cursor.getString(0), cursor.getString(1), cursor.getString(2),
+                    cursor.getString(3), cursor.getString(4)
+                )
         }
 
         return null
     }
 
-    fun isFavorite(id:Int): Boolean{
+    fun getFavorites():ArrayList<String>{
+        val list = ArrayList<String>()
+        val database = this.readableDatabase
+        val cursor = database.rawQuery("SELECT * FROM $TABLE_FAVORITES", null)
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(cursor.getString(0))
+            } while (cursor.moveToNext())
+        }
+        return list
+    }
+
+    fun isFavorite(id: Int): Boolean{
         val selectAllQuery = "SELECT * FROM $TABLE_FAVORITES WHERE $COLUMN_RESTAURANT_ID = $id"
         val database = this.readableDatabase
         val cursor: Cursor = database.rawQuery(selectAllQuery, null)

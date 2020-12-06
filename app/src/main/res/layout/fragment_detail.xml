@@ -47,7 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imgRestaurant" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imgFavorite"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/favorite"
@@ -79,7 +79,7 @@
         android:textColor="#000000"
         app:backgroundTint="#AEAEAE"
         app:layout_constraintBottom_toTopOf="@+id/googleMapsButton"
-        app:layout_constraintEnd_toStartOf="@+id/imageView2"
+        app:layout_constraintEnd_toStartOf="@+id/imgFavorite"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/imgRestaurant"
         app:layout_constraintTop_toTopOf="@+id/imgRestaurant" />
