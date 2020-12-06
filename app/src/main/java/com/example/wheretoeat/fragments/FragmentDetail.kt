@@ -53,7 +53,7 @@ class FragmentDetail() : Fragment() {
 
                 phoneNumber = restaurant.phone
                 callButton.setOnClickListener {
-                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phoneNumber"))//TODO
+                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phoneNumber"))
                     startActivity(intent)
                 }
 
@@ -75,7 +75,7 @@ class FragmentDetail() : Fragment() {
         })
 
 
-
+        Thread.sleep(1000)
 
 
         return view;

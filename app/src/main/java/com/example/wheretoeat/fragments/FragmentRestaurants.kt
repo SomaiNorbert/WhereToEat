@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wheretoeat.*
 import com.example.wheretoeat.models.ExampleItem
 import com.example.wheretoeat.models.ResponseDS
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.awaitAll
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -51,6 +53,8 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
         rViewRestaurants.adapter = RecyclerViewAdapter(rList, this)
         rViewRestaurants.layoutManager = LinearLayoutManager(requireContext())
         rViewRestaurants.setHasFixedSize(true)
+
+        Thread.sleep(1000)
         return view
     }
 

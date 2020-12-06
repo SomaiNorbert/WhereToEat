@@ -73,8 +73,8 @@ class MySqliteHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         values.put(COLUMN_ADDRESS, profile.address)
         values.put(COLUMN_EMAIL, profile.email)
         values.put(COLUMN_IMAGE, profile.image)
-        database.execSQL("UPDATE $TABLE_PROFILE SET $COLUMN_NAME = " + profile.name + " , $COLUMN_PHONE_NUMBER = " + profile.phoneNumber +
-                " , $COLUMN_ADDRESS = " + profile.address + " , $COLUMN_EMAIL = " + profile.email + " , $COLUMN_IMAGE = " + profile.image)
+        database.execSQL("UPDATE $TABLE_PROFILE SET $COLUMN_NAME = '" + profile.name + "' , $COLUMN_PHONE_NUMBER = '" + profile.phoneNumber +
+                "' , $COLUMN_ADDRESS = '" + profile.address + "' , $COLUMN_EMAIL = '" + profile.email + "' , $COLUMN_IMAGE = '" + profile.image + "'")//TODO
         database.close()
     }
 
