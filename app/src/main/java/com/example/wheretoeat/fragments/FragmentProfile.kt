@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.wheretoeat.*
 import com.example.wheretoeat.models.ExampleItem
 import com.example.wheretoeat.models.Restaurant
@@ -59,8 +60,7 @@ class FragmentProfile : Fragment(), RecyclerViewAdapter.OnItemClickedListener  {
             txtPhoneNumber.text = txt
             txt = "Email: ${profile.email}"
             txtEmail.text = txt
-            //Log.d("bug", profile.image);
-            //imgProfile.setImageURI(Uri.parse(profile.image)) //TODO set the images
+            Glide.with(this).load(profile.image).into(imgProfile)
         }
 
         btnModify.setOnClickListener {
@@ -85,15 +85,26 @@ class FragmentProfile : Fragment(), RecyclerViewAdapter.OnItemClickedListener  {
         val newList = ArrayList<ExampleItem>()
         val databaseHandler = MySqliteHandler(activity as MainActivity)
         val favoritesIDList = databaseHandler.getFavorites()
-        for(id in favoritesIDList){
-            val callRestaurant: Call<Restaurant> = openTableAPI.getRestaurantByID(id.toIntOrNull())
+        for(fav in favoritesIDList){
+            val callRestaurant: Call<Restaurant> = openTableAPI.getRestaurantByID(fav.ID)
             val responseRestaurant = callRestaurant.execute()
             val restaurant = responseRestaurant.body()!!
-            var favorite = false
-            if(databaseHandler.isFavorite(restaurant.id)){
-                favorite = true;
+            val img:String
+            val fav = databaseHandler.getFavoriteByID(restaurant.id)
+            if(databaseHandler.getFavorites().contains(fav)){
+                if(fav?.img != ""){
+                    img = fav?.img!!
+                }else{
+                    img = restaurant.image_url
+                }
+            }else{
+                img = restaurant.image_url
             }
-            newList.add(ExampleItem(restaurant.id, restaurant.image_url,restaurant.name, restaurant.address, restaurant.price, favorite))
+            Log.d("img", img)
+            if(databaseHandler.isFavorite(restaurant.id)){
+                newList.add(ExampleItem(restaurant.id, img,restaurant.name, restaurant.address, restaurant.price, true))
+            }
+
         }
 
         if(newList.isEmpty()){
@@ -103,7 +114,7 @@ class FragmentProfile : Fragment(), RecyclerViewAdapter.OnItemClickedListener  {
             txtNoFavorites.visibility = View.INVISIBLE
         }
         currentList = newList
-        rViewFavorites.adapter = RecyclerViewAdapter(newList, this)
+        rViewFavorites.adapter = RecyclerViewAdapter(newList, this, this)
         rViewFavorites.layoutManager = LinearLayoutManager(requireContext())
         rViewFavorites.setHasFixedSize(true)
 
@@ -111,7 +122,7 @@ class FragmentProfile : Fragment(), RecyclerViewAdapter.OnItemClickedListener  {
 
     override fun onItemClick(position: Int) {
         val fragmentDetail = FragmentDetail()
-        val bundle:Bundle = Bundle();
+        val bundle = Bundle();
         bundle.putInt("id", currentList[position].id);
         fragmentDetail.arguments = bundle;
         (activity as MainActivity).supportFragmentManager.beginTransaction().apply {

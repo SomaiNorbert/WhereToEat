@@ -1,17 +1,21 @@
 package com.example.wheretoeat
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.wheretoeat.models.ExampleItem
 
 
 class RecyclerViewAdapter(
     private val exampleList: List<ExampleItem>,
-    private val listener: OnItemClickedListener
+    private val listener: OnItemClickedListener,
+    private val context: Fragment
 ) : RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewHolder {
@@ -21,7 +25,8 @@ class RecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
         val currentItem = exampleList[position]
-        //holder.imageView.setImageResource(R.drawable.defaultimg);
+
+        Glide.with(context).load(currentItem.imageRes).into(holder.imageView)
         holder.textTitle.text = currentItem.title
         holder.textAddress.text = currentItem.address
         val txt = "Price: " + currentItem.price.toString()

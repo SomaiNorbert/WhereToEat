@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.wheretoeat.MainActivity
 import com.example.wheretoeat.MySqliteHandler
 import com.example.wheretoeat.R
@@ -65,8 +66,6 @@ class FragmentModifyProfile : Fragment() {
                 commit()
             }
         }
-
-
         return view;
     }
 
@@ -75,7 +74,7 @@ class FragmentModifyProfile : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == 100) {
             imageUri = data?.data
-            imgViewProfilePicture.setImageURI(Uri.parse(data?.data.toString()))
+            Glide.with(this).load(imageUri).into(imgViewProfilePicture)
         }
     }
 

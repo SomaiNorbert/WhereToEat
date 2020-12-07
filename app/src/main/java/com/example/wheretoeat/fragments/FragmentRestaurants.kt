@@ -94,7 +94,17 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
                     if(databaseHandler.isFavorite(r.id)){
                         favorite = true;
                     }
-                    val item = ExampleItem(r.id, r.image_url, r.name, r.address, r.price, favorite);
+                    val item:ExampleItem
+                    val fav = databaseHandler.getFavoriteByID(r.id)
+                    if(databaseHandler.getFavorites().contains(fav)){
+                        if(fav?.img != ""){
+                            item = ExampleItem(r.id, fav?.img!!, r.name, r.address, r.price, favorite);
+                        }else{
+                            item = ExampleItem(r.id, r.image_url, r.name, r.address, r.price, favorite);
+                        }
+                    }else{
+                        item = ExampleItem(r.id, r.image_url, r.name, r.address, r.price, favorite);
+                    }
                     rList.plusAssign(item);
                     Log.d("listSize", rList.size.toString())
                 }
@@ -124,15 +134,24 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
                 val newList = ArrayList<ExampleItem>()
                 val databaseHandler = MySqliteHandler(activity as MainActivity)
                 val favoritesIDList = databaseHandler.getFavorites()
-                for(id in favoritesIDList){
-                    val callRestaurant:Call<Restaurant> = openTableAPI.getRestaurantByID(id.toIntOrNull())
+                for(fav in favoritesIDList){
+                    val callRestaurant:Call<Restaurant> = openTableAPI.getRestaurantByID(fav.ID)
                     val responseRestaurant = callRestaurant.execute()
                     val restaurant = responseRestaurant.body()!!
-                    var favorite = false
-                    if(databaseHandler.isFavorite(restaurant.id)){
-                        favorite = true;
+                    val img:String
+                    val fav = databaseHandler.getFavoriteByID(restaurant.id)
+                    if(databaseHandler.getFavorites().contains(fav)){
+                        if(fav?.img != ""){
+                            img = fav?.img!!
+                        }else{
+                            img = restaurant.image_url
+                        }
+                    }else{
+                        img = restaurant.image_url
                     }
-                    newList.add(ExampleItem(restaurant.id, restaurant.image_url,restaurant.name, restaurant.address, restaurant.price, favorite))
+                    if(databaseHandler.isFavorite(restaurant.id)){
+                        newList.add(ExampleItem(restaurant.id, img,restaurant.name, restaurant.address, restaurant.price, true))
+                    }
                 }
                 showRestaurants(newList)
             }
@@ -165,7 +184,7 @@ class FragmentRestaurants : Fragment(), RecyclerViewAdapter.OnItemClickedListene
         else{
             noRestaurants.visibility = View.INVISIBLE
         }
-        rViewRestaurants.adapter = RecyclerViewAdapter(list, this)
+        rViewRestaurants.adapter = RecyclerViewAdapter(list, this, this)
         rViewRestaurants.layoutManager = LinearLayoutManager(requireContext())
         rViewRestaurants.setHasFixedSize(true)
 

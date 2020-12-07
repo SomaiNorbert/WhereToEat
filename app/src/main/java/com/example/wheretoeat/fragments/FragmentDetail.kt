@@ -13,10 +13,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.wheretoeat.MainActivity
 import com.example.wheretoeat.MySqliteHandler
 import com.example.wheretoeat.OpenTableAPI
 import com.example.wheretoeat.R
+import com.example.wheretoeat.models.Favorite
 import com.example.wheretoeat.models.Restaurant
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,6 +31,8 @@ class FragmentDetail() : Fragment() {
 
     private lateinit var imgFavorite:ImageView
     lateinit var imgRestaurant:ImageView
+    var id:Int? = null
+    val context = this
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +48,7 @@ class FragmentDetail() : Fragment() {
         imgFavorite = view.findViewById<ImageView>(R.id.imgFavorite)
         val changeImageButton = view.findViewById<Button>(R.id.changeImgButton)
 
-        val id: Int? = arguments?.getInt("id")
+        id = arguments?.getInt("id")
         var phoneNumber:String = ""
 
         changeImageButton.setOnClickListener {
@@ -54,13 +58,18 @@ class FragmentDetail() : Fragment() {
 
         imgFavorite.setOnClickListener {
             val databaseHandler = MySqliteHandler((activity as MainActivity))
-            if(!databaseHandler.isFavorite(id!!)){
-                databaseHandler.addIDtoFavorites(id)
+
+            if(databaseHandler.getFavorites().contains(databaseHandler.getFavoriteByID(id!!))){
+                if(!databaseHandler.isFavorite(id!!)){
+                    databaseHandler.favoritizeID(id!!)
+                }
+                else{
+                    databaseHandler.unFavoritizeID(id!!)
+                }
+            }else{
+                databaseHandler.addFavorite(Favorite(id!!, true, ""))
             }
-            else{
-                databaseHandler.removeIDfromFavorites(id)
-            }
-            updateImg(id)
+            updateImg(id!!)
         }
 
         val retrofit = Retrofit.Builder()
@@ -69,35 +78,36 @@ class FragmentDetail() : Fragment() {
             .build()
         val openTableAPI: OpenTableAPI = retrofit.create(OpenTableAPI::class.java)
         val myCall: Call<Restaurant> = openTableAPI.getRestaurantByID(id)
-        myCall.enqueue(object : Callback<Restaurant> {
-            override fun onResponse(call: Call<Restaurant>, response: Response<Restaurant>) {
-                val restaurant = response.body()!!
-                txtRestaurantName.text = restaurant.name
-                txtDetails.text = restaurant.toString()
-                imgRestaurant.setImageResource(R.mipmap.profileicon)
 
-                updateImg(restaurant.id)
+        val restaurant = myCall.execute().body()!!
+        txtRestaurantName.text = restaurant.name
+        txtDetails.text = restaurant.toString()
+        val databaseHandler = MySqliteHandler(activity as MainActivity)
+        val data = databaseHandler.getFavoriteByID(id!!)
+        if(data?.img == ""){
+            Glide.with(context).load(restaurant.image_url).into(imgRestaurant)
+        }
+        else{
+            Glide.with(context).load(data?.img).into(imgRestaurant)
+        }
 
-                phoneNumber = restaurant.phone
-                callButton.setOnClickListener {
-                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phoneNumber"))
-                    startActivity(intent)
-                }
+        updateImg(restaurant.id)
 
-                val lat = restaurant.lat
-                val lng = restaurant.lng
-                val name = restaurant.name
-                googleMapsButton.setOnClickListener {
-                    val gmmIntentUri = Uri.parse("geo:$lat,$lng?z=10&q=$name")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
-                    startActivity(mapIntent)
-                }
-            }
-            override fun onFailure(call: Call<Restaurant>, t: Throwable) {
-                Log.e("asd", t.message.toString())
-            }
-        })
+        phoneNumber = restaurant.phone
+        callButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phoneNumber"))
+            startActivity(intent)
+        }
+
+        val lat = restaurant.lat
+        val lng = restaurant.lng
+        val name = restaurant.name
+        googleMapsButton.setOnClickListener {
+            val gmmIntentUri = Uri.parse("geo:$lat,$lng?z=10&q=$name")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            startActivity(mapIntent)
+        }
         Thread.sleep(1000)
         return view;
     }
@@ -116,7 +126,14 @@ class FragmentDetail() : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 100) {
-            imgRestaurant.setImageURI(Uri.parse(data?.data.toString()))
+            Glide.with(this).load(data?.data).into(imgRestaurant)
+            val databaseHandler = MySqliteHandler(activity as MainActivity)
+            if(databaseHandler.getFavorites().contains(databaseHandler.getFavoriteByID(id!!))){
+                databaseHandler.setImgToID(id!!, data?.data.toString())
+            }
+            else{
+                databaseHandler.addFavorite(Favorite(id!!, false, data?.data.toString()))
+            }
         }
     }
 
