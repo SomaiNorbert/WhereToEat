@@ -77,7 +77,7 @@ class FragmentProfile : Fragment(), RecyclerViewAdapter.OnItemClickedListener  {
 
     private fun showFavorites(){
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://opentable.herokuapp.com/api/")
+            .baseUrl("https://ratpark-api.imok.space/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val openTableAPI: OpenTableAPI = retrofit.create(OpenTableAPI::class.java)
