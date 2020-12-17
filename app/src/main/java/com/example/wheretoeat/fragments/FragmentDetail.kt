@@ -85,9 +85,11 @@ class FragmentDetail() : Fragment() {
         val databaseHandler = MySqliteHandler(activity as MainActivity)
         val data = databaseHandler.getFavoriteByID(id!!)
         if(data?.img == ""){
+            Log.d("img", restaurant.image_url)
             Glide.with(context).load(restaurant.image_url).into(imgRestaurant)
         }
         else{
+            Log.d("img2", data?.img.toString())
             Glide.with(context).load(data?.img).into(imgRestaurant)
         }
 
